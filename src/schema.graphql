@@ -1,0 +1,85 @@
+enum Sort {
+  asc
+  desc
+}
+input LinkOrderByInput {
+  description: Sort
+  url: Sort
+  createdAt: Sort
+}
+
+# type Query {
+#   ROOT_FIELD_NAME: ROOT_FIELD_TYPE
+# }
+# type Mutation {
+#   ROOT_FIELD_NAME: ROOT_FIELD_TYPE
+# }
+# type Subscription {
+#   ROOT_FIELD_NAME: ROOT_FIELD_TYPE
+# }
+# 
+# type TYPE_NAME {
+#   FIELD_NAME(ARG_NAME: ARG_TYPE, ...): FIELD_TYPE
+# }
+
+type Query {
+  info: String!
+  # get all links
+  # possibly filtering for that links that match some substring filter in url or description
+  # possibly paginating (from skip to take indexes of links)
+  # possibly ordering by some criteria
+  feed(filter: String, skip: Int, take: Int, orderBy: LinkOrderByInput): Feed
+  # get a link
+  link(id: ID!): Link
+}
+
+type Mutation {
+  signUp(email: String!, password: String!, name: String!): AuthPayload
+  login(email: String!, password: String!): AuthPayload
+  # create a new link (get user by jwt token of the request header)
+  addLink(url: String!, description: String!): Link!
+  # update an existing link
+  updateLink(id: ID!, url: String, description: String): Link
+  # delete an existing link
+  deleteLink(id: ID!): Link
+  # create a new vote (get user by jwt token of the request header)
+  addVote(linkId: ID!): Vote
+}
+
+type Subscription {
+  # be notified when a new link is created
+  newLink: Link
+  # be notified when a new vote is created
+  newVote: Vote
+}
+
+type AuthPayload {
+  token: String
+  user: User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  links: [Link!]!
+}
+
+type Link {
+  id: ID!
+  url: String!
+  description: String!
+  postedBy: User
+  votes: [Vote!]!
+}
+
+type Vote {
+  id: ID!
+  link: Link!
+  user: User!
+}
+
+type Feed {
+  links: [Link!]!
+  count: Int!
+}
